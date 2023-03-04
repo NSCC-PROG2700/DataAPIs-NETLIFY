@@ -1,6 +1,9 @@
-exports.handler = async function (event, context) {
+import headers from "../../headers";
+
+export async function handler(event, context) {
   return {
     statusCode: 200,
+    headers,
     body: JSON.stringify({ message: "Hello World" }),
   };
-};
+}
