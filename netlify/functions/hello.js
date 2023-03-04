@@ -1,10 +1,9 @@
-exports.handler =  async function(event, context) {
+const headers = require("../../headers");
+
+exports.handler = async function (event, context) {
   return {
     statusCode: 200,
-    headers: {
-      "content-type": "application/json",
-      "Access-Control-Allow-Origin": "*",
-    },
+    headers,
     body: JSON.stringify({ message: "Hello World" }),
   };
-}
+};
