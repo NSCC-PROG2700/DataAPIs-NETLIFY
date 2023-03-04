@@ -1,37 +1,41 @@
-import GtfsRealtimeBindings from "gtfs-realtime-bindings";
-import axios from "axios";
-import MomentoCache from "@macaines/momento-cache";
+const GtfsRealtimeBindings = require("gtfs-realtime-bindings");
+const axios = require("axios");
+const MomentoCache = require("@macaines/momento-cache");
+const headers = require("../../headers");
 
 const MomentoAuthToken = process.env.MOMENTO_AUTH_TOKEN;
-//const MomentoCacheName = process.env.MOMENTO_CACHE_NAME;
-//const MomentoHRMBusesKey = process.env.MOMENTO_CACHE_HRMBUSES_KEY;
+const MomentoCacheName = process.env.MOMENTO_CACHE_NAME;
+const MomentoHRMBusesKey = process.env.MOMENTO_CACHE_HRMBUSES_KEY;
 const HRMBusesRefreshInterval = parseInt(process.env.HRMBUSES_INTERVAL_SECONDS);
 const HRMBusesProtobufUrl = process.env.HRMBUSES_PROTOBUF_URL;
 
-const cache = new MomentoCache(MomentoAuthToken, HRMBusesRefreshInterval);
+const cache = new MomentoCache.default(
+  MomentoAuthToken,
+  HRMBusesRefreshInterval
+);
 
-export async function handler(event, context) {
+exports.handler = async function (event, context) {
   try {
     let feed;
-    // let busesCache = await cache.getCache(MomentoCacheName, MomentoHRMBusesKey);
+    let busesCache = await cache.getCache(MomentoCacheName, MomentoHRMBusesKey);
 
-    // if (busesCache) {
-    //   console.log("RETURNED BUSES CACHE FROM MOMENTO");
-    //   feed = JSON.parse(busesCache);
-    // } else {
+    if (busesCache) {
+      console.log("RETURNED BUSES CACHE FROM MOMENTO");
+      feed = JSON.parse(busesCache);
+    } else {
       const response = await axios.get(HRMBusesProtobufUrl, {
         responseType: "arraybuffer",
       });
       feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(
         response.data
       );
-      // await cache.setCache(
-      //   MomentoCacheName,
-      //   MomentoHRMBusesKey,
-      //   JSON.stringify(feed)
-      // );
+      await cache.setCache(
+        MomentoCacheName,
+        MomentoHRMBusesKey,
+        JSON.stringify(feed)
+      );
       console.log("RETURNED BUSES FETCH");
-//    }
+    }
 
     if (!feed.entity) {
       feed.entity = [];
@@ -46,10 +50,7 @@ export async function handler(event, context) {
 
     return {
       statusCode: 200,
-      headers: {
-        "content-type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-      },
+      headers,
       body: JSON.stringify(feed),
     };
   } catch (err) {
@@ -58,4 +59,4 @@ export async function handler(event, context) {
       statusCode: 500,
     };
   }
-}
+};

@@ -1,4 +1,4 @@
-export default headers = {
+module.exports = {
   "content-type": "application/json",
   "Access-Control-Allow-Origin": "*",
 };
