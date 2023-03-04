@@ -11,5 +11,8 @@
   "license": "ISC",
   "devDependencies": {
     "netlify-cli": "^13.0.1"
+  },
+  "dependencies": {
+    "gtfs-realtime-bindings": "^1.1.1"
   }
 }
