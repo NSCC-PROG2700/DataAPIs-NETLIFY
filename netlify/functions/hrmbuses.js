@@ -1,4 +1,3 @@
-import headers from "../../headers";
 import GtfsRealtimeBindings from "gtfs-realtime-bindings";
 import axios from "axios";
 //import MomentoCache from "@macaines/momento-cache";
@@ -47,7 +46,10 @@ export async function handler(event, context) {
 
     return {
       statusCode: 200,
-      headers,
+      headers: {
+        "content-type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+      },
       body: JSON.stringify(feed),
     };
   } catch (err) {
