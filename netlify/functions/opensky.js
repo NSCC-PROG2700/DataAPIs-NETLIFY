@@ -11,29 +11,35 @@ const OpenskyAPIEndpointURL = process.env.OPENSKY_API_ENDPOINT;
 
 const cache = new MomentoCache(MomentoAuthToken, OpenskyRefreshInterval);
 
-let fetchInProgress = false;
-const untilAnyExistingDataFetchFinishes = (clientIP) => {
-  return new Promise((resolve, reject) => {
-    const checkIfFetchInProgress = () => {
-      if (fetchInProgress) {
-        console.log(`${clientIP} - WAITING FOR EXISTING FETCH TO FINISH`);
-        setTimeout(checkIfFetchInProgress, 500);
-      } else {
-        resolve();
-      }
-    };
-    checkIfFetchInProgress();
-  });
-};
+// //THIS CODE IS IMPLEMENTED FOR OTHER PLATFORMS BUT WON'T WORK WITH 
+// //NETLIFY FUNCTIONS BECAUSE EACH FUNCTION INVOCATION IS
+// //COMPLETELY ISOLATED FROM THE OTHER...KEEPING HERE FOR POSTERITY
+// //BUT IT DOESN'T WORK WITH SERVERLESS FUNCTIONS
+// let fetchInProgress = false;
+// const untilAnyExistingDataFetchFinishes = (clientIP) => {
+//   return new Promise((resolve, reject) => {
+//     const checkIfFetchInProgress = () => {
+//       if (fetchInProgress) {
+//         console.log(`${clientIP} - WAITING FOR EXISTING FETCH TO FINISH`);
+//         setTimeout(checkIfFetchInProgress, 500);
+//       } else {
+//         resolve();
+//       }
+//     };
+//     checkIfFetchInProgress();
+//   });
+// };
 
 exports.handler = async function (event, context) {
   try {
+    //DOESN'T WORK WITH NETLIFY FUNCTIONS
     //when we arrive here, it is possible that another request
     //has already triggered a fetch for new data which is still in progress
     //to avoid a second, unnecessary duplicate fetch...
     //wait for current fetch to finish if necessary
     //and for the newly fetched data to be cached before proceeding
-    await untilAnyExistingDataFetchFinishes(event.headers["client-ip"]); //checks every .5 seconds for existing data fetch to be completed
+
+    //await untilAnyExistingDataFetchFinishes(event.headers["x-nf-client-connection-ip"]); //checks every .5 seconds for existing data fetch to be completed
 
     let openskyCache = await cache.getCache(
       MomentoCacheName,
@@ -48,7 +54,7 @@ exports.handler = async function (event, context) {
         body: openskyCache,
       };
     } else {
-      fetchInProgress = true;
+      //fetchInProgress = true;
       const credentials = await openskyManager.getActiveCredentials();
       const response = await axios.get(OpenskyAPIEndpointURL, {
         auth: {
@@ -65,7 +71,7 @@ exports.handler = async function (event, context) {
       );
       console.log(event.headers);
       console.log(
-        `${event.headers["client-ip"]} - RETURNED OPENSKY FETCH - Account: ${credentials.username} - ${response.headers["x-rate-limit-remaining"]} fetches remaining`
+        `${event.headers["x-nf-client-connection-ip"]} - RETURNED OPENSKY FETCH - Account: ${credentials.username} - ${response.headers["x-rate-limit-remaining"]} fetches remaining`
       );
 
       if (response.headers["x-rate-limit-remaining"] <= 0) {
@@ -99,6 +105,6 @@ exports.handler = async function (event, context) {
     };
   } finally {
     //reset flag in case it was set to true
-    fetchInProgress = false;
+    //fetchInProgress = false;
   }
 };
