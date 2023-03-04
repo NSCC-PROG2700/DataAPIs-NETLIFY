@@ -46,7 +46,7 @@ const updateActiveAccountInDb = (newActiveAccount) => {
       );
       resolve();
     } catch (err) {
-      throw err;
+      reject(err);
     }
   });
 };
@@ -93,9 +93,9 @@ module.exports = {
 
         await updateActiveAccountInDb(newActiveAccount);
         console.log(`OPENSKY ACTIVE ACCOUNT CHANGED TO ${newActiveAccount}`);
+        resolve()
       } catch (err) {
-        console.log("UNABLE TO SWITCH ACCOUNTS");
-        console.log(err);
+        reject(err)
       }
     });
   },
