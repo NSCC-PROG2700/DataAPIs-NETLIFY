@@ -1,4 +1,4 @@
-import headers from "../../headers/index.js";
+import headers from "../../headers";
 import GtfsRealtimeBindings from "gtfs-realtime-bindings";
 import axios from "axios";
 import MomentoCache from "@macaines/momento-cache";
