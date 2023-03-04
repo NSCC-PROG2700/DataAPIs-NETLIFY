@@ -23,9 +23,16 @@ exports.handler = async function (event, context) {
       const response = await axios.get(HRMBusesProtobufUrl, {
         responseType: "arraybuffer",
       });
-      feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(
-        response.data
+      feed = JSON.parse(
+        JSON.stringify(
+          GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(
+            response.data
+          )
+        )
       );
+      if (!feed.entity) {
+        feed.entity = [];
+      }
       await cache.setCache(
         MomentoCacheName,
         MomentoHRMBusesKey,
@@ -34,9 +41,7 @@ exports.handler = async function (event, context) {
       console.log("RETURNED BUSES FETCH");
     }
 
-    if (!feed.entity) {
-      feed.entity = [];
-    } else if (event.queryStringParameters.route !== undefined) {
+    if (event.queryStringParameters.route !== undefined) {
       feed.entity = feed.entity.filter((entity) =>
         event.queryStringParameters.route
           .replace(" ", "")
