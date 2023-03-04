@@ -63,6 +63,7 @@ exports.handler = async function (event, context) {
         MomentoOpenskyKey,
         JSON.stringify(response.data)
       );
+      console.log(event.headers);
       console.log(
         `${event.headers["client-ip"]} - RETURNED OPENSKY FETCH - Account: ${credentials.username} - ${response.headers["x-rate-limit-remaining"]} fetches remaining`
       );
