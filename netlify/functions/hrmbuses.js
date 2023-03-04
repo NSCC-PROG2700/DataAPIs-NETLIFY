@@ -12,6 +12,9 @@ const HRMBusesProtobufUrl = process.env.HRMBUSES_PROTOBUF_URL;
 const cache = new MomentoCache(MomentoAuthToken, HRMBusesRefreshInterval);
 
 exports.handler = async function (event, context) {
+
+  console.log(event)
+
   try {
     let feed;
     let busesCache = await cache.getCache(MomentoCacheName, MomentoHRMBusesKey);
