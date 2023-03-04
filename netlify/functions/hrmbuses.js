@@ -1,14 +1,14 @@
 import GtfsRealtimeBindings from "gtfs-realtime-bindings";
 import axios from "axios";
-//import MomentoCache from "@macaines/momento-cache";
+import MomentoCache from "@macaines/momento-cache";
 
-//const MomentoAuthToken = process.env.MOMENTO_AUTH_TOKEN;
+const MomentoAuthToken = process.env.MOMENTO_AUTH_TOKEN;
 //const MomentoCacheName = process.env.MOMENTO_CACHE_NAME;
 //const MomentoHRMBusesKey = process.env.MOMENTO_CACHE_HRMBUSES_KEY;
-//const HRMBusesRefreshInterval = parseInt(process.env.HRMBUSES_INTERVAL_SECONDS);
+const HRMBusesRefreshInterval = parseInt(process.env.HRMBUSES_INTERVAL_SECONDS);
 const HRMBusesProtobufUrl = process.env.HRMBUSES_PROTOBUF_URL;
 
-//const cache = new MomentoCache(MomentoAuthToken, HRMBusesRefreshInterval);
+const cache = new MomentoCache(MomentoAuthToken, HRMBusesRefreshInterval);
 
 export async function handler(event, context) {
   try {
